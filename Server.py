@@ -46,19 +46,19 @@ def go():
                 global connection
                 global cursor
                 
-                create_database_if_not_exists("grpc_db2")  
+                create_database_if_not_exists("grpc_db")  
 
                 connection = psycopg2.connect(user="postgres",
                                   password="test",
                                   host="localhost",
                                   port="5432",
-                                  database="grpc_db2")
+                                  database="grpc_db")
 
             
                 cursor = connection.cursor()
 
                 create_table_query = '''
-                    create table if not exists grpc_data2 (  
+                    create table if not exists grpc_data(  
                     NUMBER TEXT,  
                     DATA TEXT,
                     TIMING TEXT
@@ -69,7 +69,7 @@ def go():
                 msg2 = msg[1]
                 msg3 = msg[2]
 
-                insert_query = "INSERT INTO grpc_data2 (NUMBER, DATA, TIMING) VALUES (%s, %s, %s);"  
+                insert_query = "INSERT INTO grpc_data (NUMBER, DATA, TIMING) VALUES (%s, %s, %s);"  
                 
                 cursor.execute(create_table_query)
                 cursor.execute(insert_query, (msg1, msg2, msg3))
