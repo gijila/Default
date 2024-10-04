@@ -5,6 +5,31 @@ from psycopg2 import Error
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+
+def create_database_if_not_exists(db_name):  
+    connection = psycopg2.connect(user="postgres",  
+                                  password="test",  
+                                  host="localhost",  
+                                  port="5432",  
+                                  database="postgres")
+    connection.autocommit = True
+    cursor = connection.cursor()  
+
+    try:  
+        cursor.execute(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'")  
+        exists = cursor.fetchone()  
+        
+        if not exists:  
+            cursor.execute("CREATE DATABASE " + db_name)
+            print(f"Database {db_name} created")  
+        else:  
+            print(f"Database {db_name} already exists")  
+    except (Exception, psycopg2.Error) as error:  
+        print("Error while creating database:", error)  
+    finally:  
+        cursor.close()  
+        connection.close()  
     
 def go():
     conn, addr = s.accept()
@@ -21,17 +46,19 @@ def go():
                 global connection
                 global cursor
                 
+                create_database_if_not_exists("grpc_db2")  
+
                 connection = psycopg2.connect(user="postgres",
                                   password="test",
-                                  host="0.0.0.0",
+                                  host="localhost",
                                   port="5432",
-                                  database="grpc_db")
+                                  database="grpc_db2")
 
             
-                cursor = connection.cursor()  
+                cursor = connection.cursor()
 
                 create_table_query = '''
-                    create table if not exists grpc_data (  
+                    create table if not exists grpc_data2 (  
                     NUMBER TEXT,  
                     DATA TEXT,
                     TIMING TEXT
@@ -40,9 +67,9 @@ def go():
 
                 msg1 = msg[0]
                 msg2 = msg[1]
-                msg3 = msg[3]
+                msg3 = msg[2]
 
-                insert_query = "INSERT INTO grpc_data (NUMBER, DATA, TIMING) VALUES (%s, %s, %s);"  
+                insert_query = "INSERT INTO grpc_data2 (NUMBER, DATA, TIMING) VALUES (%s, %s, %s);"  
                 
                 cursor.execute(create_table_query)
                 cursor.execute(insert_query, (msg1, msg2, msg3))
