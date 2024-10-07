@@ -8,13 +8,19 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 def create_database_if_not_exists(db_name):  
-    connection = psycopg2.connect(user="postgres",  
-                                  password="test",  
-                                  host="localhost",  
-                                  port="5432",  
-                                  database="postgres")
-    connection.autocommit = True
-    cursor = connection.cursor()  
+    with open('Server_settings.json', 'r', encoding='utf-8') as f:  
+            text = json.load(f)
+
+            username = text["gRPCServerUser"]
+            password = text["gRPCServerPassword"]
+    
+            connection = psycopg2.connect(user=username,  
+                                          password=password,  
+                                          host="localhost",  
+                                          port="5432",  
+                                          database="postgres")
+            connection.autocommit = True
+            cursor = connection.cursor()  
 
     try:  
         cursor.execute(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'")  
