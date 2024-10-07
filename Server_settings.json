@@ -1,3 +1,5 @@
 {  
+  "gRPCServerUser": "postgres",
+  "gRPCServerPassword": "test",
   "gRPCServerPort": "12345"
 }  
